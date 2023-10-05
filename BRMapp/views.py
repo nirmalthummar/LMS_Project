@@ -4,6 +4,7 @@ from BRMapp import models
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 
 def userLogin(request):
     data={}
@@ -27,17 +28,44 @@ def userLogout(request):
     return HttpResponseRedirect('/BRMapp/login/')
 
 # @login_required(login_url="/BRMapp/login/")
-def searchBook(request):
-    form=SearchForm()
-    res=render(request, 'BRMapp/search_book.html', {'form':form})
-    return res
+# def searchBook(request):
+#     form=SearchForm()
+#     res=render(request, 'BRMapp/search_book.html', {'form':form})
+#     return res
 
 # @login_required(login_url="/BRMapp/login/")
+# views.py
+from django.shortcuts import render
+from .models import Book
+from .forms import SearchForm
+
 def search(request):
-    form=SearchForm(request.POST)
-    books=models.Book.objects.filter(title=form.data['title'])
-    res=render(request, 'BRMapp/search_book.html', {'form':form,'books':books})
-    return res
+    if request.method == 'POST':
+        form = SearchForm(request.POST)
+        if form.is_valid():
+            title_query = form.cleaned_data.get('title')
+            author_query = form.cleaned_data.get('author')
+
+            # Initialize an empty query
+            query = Q()
+
+            # Add title condition if title is provided
+            if title_query:
+                query |= Q(title__icontains=title_query)
+
+            # Add author condition if author is provided
+            if author_query:
+                query |= Q(author__icontains=author_query)
+
+            # Execute the combined query
+            books = Book.objects.filter(query)
+
+            return render(request, 'BRMapp/search_book.html', {'form': form, 'books': books})
+    else:
+        form = SearchForm()
+
+    return render(request, 'BRMapp/search_book.html', {'form': form})
+
 
 @login_required(login_url="/BRMapp/login/")
 def deleteBook(request):
@@ -73,13 +101,13 @@ def viewBooks(request):
     # username=request.session['username']
     # return render(request, 'BRMapp/view_book.html', {'books':books,'username':username})
     # res=render(request, 'BRMapp/view_book.html', {'books':books})
-    return render(request, 'BRMapp/view_book.html', {'nirupa':books})
+    return render(request, 'BRMapp/view_book.html', {'books':books})
 
-# @login_required(login_url="/BRMapp/login/")
+@login_required(login_url="/BRMapp/login/")
 def newBook(request):
-    nirupa_form=NewBookForm()
+    form=NewBookForm()
     # return render(request,'BRMapp/new_book.html')
-    return render(request,'BRMapp/new_book.html', {'form':nirupa_form})
+    return render(request,'BRMapp/new_book.html', {'form':form})
     # res=render(request,'BRMapp/new_book.html',{'form':form})
     # return res
 

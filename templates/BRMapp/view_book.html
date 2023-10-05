@@ -28,12 +28,12 @@
           <th>Publisher</th>
         </thead>
 
-        {% for kaushik in nirupa %}
+        {% for book in books %}
         <tr>
-          <td>{{kaushik.title}}</td>
-          <td>{{kaushik.price}}</td>
-          <td>{{kaushik.author}}</td>
-          <td>{{kaushik.publisher}}</td>
+          <td>{{book.title}}</td>
+          <td>{{book.price}}</td>
+          <td>{{book.author}}</td>
+          <td>{{book.publisher}}</td>
           <td><a class="btn" href="/BRMapp/edit-book?bookid={{book.id}}">Edit</a></td>
           <td><a class="btn" href="/BRMapp/delete-book?bookid={{book.id}}">Delete</a></td>
         </tr>
