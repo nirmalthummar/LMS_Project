@@ -23,8 +23,6 @@ from django.urls import include
 
 urlpatterns = [
     path('',views.userLogin),
-    
     path('BRMapp/',include('BRMapp.urls')),
-   
     path('admin/', admin.site.urls),
 ]
